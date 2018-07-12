@@ -33,7 +33,7 @@ Extractor.custom({
 })
 ```
 
-If you want you can get rid of html comments `<!-- -->`` to ignore class names in commented code. To do this you can define `contentProcessor` are remove html comments before looking for matches 
+If you want you can get rid of html comments `<!-- -->` to ignore class names in commented code. To do this you can define `contentProcessor` and remove html comments before looking for matches 
 
 ```javascript
 Extractor.custom({
@@ -63,7 +63,7 @@ Extractor.custom({
 
 ## API
 
-### `custom({regex, matchProcessor, contentProcessor})`
+#### `custom({regex, matchProcessor, contentProcessor})`
 Function to create custom extractor
 
 `regex`: RegExp or string (`/\w+/g`, `"\w+"`, `"/\w+/g"`) </br>
