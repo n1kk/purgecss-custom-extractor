@@ -1,0 +1,23 @@
+{
+  "name": "purgecss-custom-extractor",
+  "version": "0.1.0",
+  "description": "Tool to create a custom extractor for Purgecss",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/n1kk/cv.git"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "n1kk",
+  "license": "ISC",
+  "dependencies": {
+    "html-tags": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^10.5.2",
+    "typescript": "^2.9.2"
+  }
+}
