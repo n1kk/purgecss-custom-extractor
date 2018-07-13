@@ -39,8 +39,6 @@ export function custom({regex, matchProcessor = null, contentProcessor = null}:C
         regex = new RegExp(regex)
       }
       let list = matchAll(regex, content, matchProcessor)
-      console.log(content.substr(0, 20))
-      console.log({list})
       return list
     }
   }

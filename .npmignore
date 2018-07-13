@@ -1,4 +1,11 @@
-!index.js
-!index.d.ts
-*.*
+.idea
 
+.editorconfig
+.gitignore
+.npmignore
+
+index.ts
+
+tsconfig.json
+yarn.lock
+package-lock.json

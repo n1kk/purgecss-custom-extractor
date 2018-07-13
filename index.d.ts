@@ -8,7 +8,7 @@ export declare type CustomExtractorOptions = {
     matchProcessor?: MatchProcessor;
     contentProcessor?: (content: string) => string;
 };
-export declare function custom({regex, matchProcessor, contentProcessor}: CustomExtractorOptions): PurgecssExtractor;
+export declare function custom({ regex, matchProcessor, contentProcessor }: CustomExtractorOptions): PurgecssExtractor;
 export declare const regex: {
     simple: () => RegExp;
     extended: () => RegExp;
