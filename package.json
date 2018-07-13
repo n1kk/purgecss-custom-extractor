@@ -1,6 +1,6 @@
 {
   "name": "purgecss-custom-extractor",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Tool to create a custom extractor for Purgecss",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -19,5 +19,13 @@
   "devDependencies": {
     "@types/node": "^10.5.2",
     "typescript": "^2.9.2"
-  }
+  },
+  "keywords": [
+    "purgecss",
+    "purge css",
+    "extractor",
+    "custom extractor",
+    "plugin",
+    "css"
+  ]
 }
