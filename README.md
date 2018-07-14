@@ -10,7 +10,8 @@ npm i purgecss-custom-extractor
 ```
 
 ## Usage
-First argument can be a RegExp, a string with regex or and array of regex and function to process each match.
+Accepts regex as a RegExp or string with it (`'\w+'`, `'/\w+/g'`)
+First argument can be regex or an array of regex and match processor or a list with a mix of both.
 ```javascript
 const purgeCss = new Purgecss({
   content: ['**/*.html'],
@@ -85,7 +86,7 @@ First argument can be either of these:
 ### `matchAll(re, text, matchProcessor)`
 Function to get all the matches from given string
 
-- `re`: RegExp
+- `re`: RegExp or string with it (`'\w+'`, `'/\w+/g'`)
 - `text`: text to match in
 - _`matchProcessor`_: [optional] will receive result of each match and will return processed value, can return string or array of strings (`m => m[1]`)
 - __`returns`__: array of all the matched strings
