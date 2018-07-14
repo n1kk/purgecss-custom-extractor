@@ -1,44 +1,109 @@
 import htmltags from 'html-tags'
-
-export function matchAll(re:RegExp, text:string, matchProcessor: MatchProcessor):string[] {
-  let match, list = []
-  while (match = re.exec(text)) {
-    match = matchProcessor ? matchProcessor(match) : match[0]
-    if (Array.isArray(match))
-      list.push.apply(list, match)
-    else
-      list.push(match)
-  }
-  return list
-}
+import {type} from "os";
 
 export type MatchProcessor = (match:string[]) => string|string[]
 export type PurgecssExtractor = {
   extract(content:string): string[]
 }
+export type RegexOrStr = RegExp|string
+export type RegexPair = [RegexOrStr, MatchProcessor]
+export type RegexOrPairs = Array<RegexOrStr|RegexPair>
+export type AcceptedRegex = RegexOrStr|RegexPair|RegexOrPairs
+export type PostMatchProcessor = (match:string|string[]) => string
+export type ContentProcessor = (match:string) => string
 export type CustomExtractorOptions = {
-  regex:RegExp|string
-  matchProcessor?: MatchProcessor
-  contentProcessor?: (content:string) => string
+  regex:AcceptedRegex
+  matchProcessor?: PostMatchProcessor
+  contentProcessor?: ContentProcessor
 }
 
-export function custom({regex, matchProcessor = null, contentProcessor = null}:CustomExtractorOptions):PurgecssExtractor {
+function err(...args:any[]) {
+  throw new Error(['[purgecss-custom-extractor]'].concat(args).join(' '))
+}
+
+function listAdder(list:any[]) {
+  return function addToList(elems:any|any[]) {
+    if (Array.isArray(elems))
+      list.push.apply(list, elems)
+    else
+      list.push(elems)
+  }
+}
+
+function RegExpOrString(re:RegexOrStr, f?:string):RegExp {
+  if (re instanceof RegExp) {
+    re = new RegExp(re, f)
+  } else {
+    let flags = f || ''
+    if (re.charAt(0) === '/') {
+      let lastSlash = re.lastIndexOf('/')
+      re.substring(lastSlash + 1).split('').forEach(f => {
+        if (!flags.includes(f))
+          flags += f
+      })
+      re = re.substring(1, lastSlash)
+    }
+    re = new RegExp(re, flags)
+  }
+  return re
+}
+
+export function matchAll(re:RegexOrStr, text:string, matchProcessor?: MatchProcessor):string[] {
+  let match, list:string[] = [], add = listAdder(list)
+  re = RegExpOrString(re, 'g')
+  while (match = re.exec(text)) {
+    add(matchProcessor ? matchProcessor(match) : match[0])
+  }
+  return list
+}
+
+export function custom(opts:CustomExtractorOptions|AcceptedRegex):PurgecssExtractor {
+  let regex:AcceptedRegex, matchProcessor:PostMatchProcessor = null, contentProcessor:ContentProcessor = null;
+  if (typeof opts === 'string' || opts instanceof RegExp || opts instanceof Array) {
+    regex = opts
+  } else if (typeof opts === 'object') {
+    ({regex, matchProcessor, contentProcessor} = opts)
+    // check args
+    if (!regex) err(`regex option not set`)
+    if (!(typeof regex === 'string' || regex instanceof RegExp || regex instanceof Array))
+      err(`Regex option should be string or RegExp or array. got: [${typeof regex}] ${regex}`)
+  } else {
+    err(`First argument should be string or RegExp or array or options object. got: [${typeof opts}] ${opts}`)
+  }
+
   return {
     extract(content:string) {
       if (contentProcessor)
         content = contentProcessor(content)
-      let flags
-      if (typeof regex === 'string') {
-        if (regex.charAt(0) === '/') {
-          let lastSlash = regex.lastIndexOf('/')
-          flags = regex.substring(lastSlash + 1)
-          regex = regex.substring(1, lastSlash)
+
+      let list:string[] = [],
+        add = listAdder(list)
+
+      if (regex instanceof Array) {
+        if (regex.length > 1 && regex[1] instanceof Function) {
+          // regex is a pair of [re, each]
+          let [re, each] = <RegexPair>regex
+          add(matchAll(re, content, each))
+        } else {
+          // regex is array of: regexp or a pair of [re, each]
+          (<RegexOrPairs>regex).forEach(ri => {
+            if (ri instanceof Array) {
+              // ri is a pair of [re, each]
+              let [re, each] = ri
+              add(matchAll(re, content, each))
+            } else {
+              // ri is regexp
+              add(matchAll(ri, content))
+            }
+          })
         }
-        regex = new RegExp(regex, flags)
       } else {
-        regex = new RegExp(regex)
+        // regex is regexp
+        add(matchAll(regex, content))
       }
-      let list = matchAll(regex, content, matchProcessor)
+      if (matchProcessor)
+        list = list.map(matchProcessor)
+
       return list
     }
   }

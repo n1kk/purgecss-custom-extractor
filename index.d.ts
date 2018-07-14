@@ -1,14 +1,20 @@
-export declare function matchAll(re: RegExp, text: string, matchProcessor: MatchProcessor): string[];
 export declare type MatchProcessor = (match: string[]) => string | string[];
 export declare type PurgecssExtractor = {
     extract(content: string): string[];
 };
+export declare type RegexOrStr = RegExp | string;
+export declare type RegexPair = [RegexOrStr, MatchProcessor];
+export declare type RegexOrPairs = Array<RegexOrStr | RegexPair>;
+export declare type AcceptedRegex = RegexOrStr | RegexPair | RegexOrPairs;
+export declare type PostMatchProcessor = (match: string | string[]) => string;
+export declare type ContentProcessor = (match: string) => string;
 export declare type CustomExtractorOptions = {
-    regex: RegExp | string;
-    matchProcessor?: MatchProcessor;
-    contentProcessor?: (content: string) => string;
+    regex: AcceptedRegex;
+    matchProcessor?: PostMatchProcessor;
+    contentProcessor?: ContentProcessor;
 };
-export declare function custom({ regex, matchProcessor, contentProcessor }: CustomExtractorOptions): PurgecssExtractor;
+export declare function matchAll(re: RegexOrStr, text: string, matchProcessor?: MatchProcessor): string[];
+export declare function custom(opts: CustomExtractorOptions | AcceptedRegex): PurgecssExtractor;
 export declare const regex: {
     simple: () => RegExp;
     extended: () => RegExp;
